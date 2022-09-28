@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { OrbitControls } from "three-orbitcontrols-ts";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { camera, scene, renderer } from "../module/renderer";
 import * as dat from "dat.gui";
 import "./style.css";
@@ -13,7 +13,7 @@ control.enableDamping = true;
 
 const plane = new THREE.Mesh(
   new THREE.PlaneGeometry(40, 40),
-  new THREE.MeshPhongMaterial({ color: "white", side: THREE.DoubleSide })
+  new THREE.MeshStandardMaterial({ color: "white", side: THREE.DoubleSide })
 );
 plane.rotation.x = Math.PI * -0.5;
 plane.position.y = -5;
@@ -58,6 +58,12 @@ const hemisphereLight = new THREE.HemisphereLight(
   params.groundColor,
   1
 );
+// gui.addColor(params, "skyColor").onChange(() => {
+//   hemisphereLight.color.set(params.skyColor);
+// });
+// gui.addColor(params, "color").onChange(() => {
+//   hemisphereLight.groundColor.set(params.groundColor);
+// });
 
 // #3 Directional light - represent the sun
 const directionalLight = new THREE.DirectionalLight(params.color, 1);
@@ -66,24 +72,27 @@ directionalLight.target.position.set(-5, 0, 0);
 
 // To see what's going on directional light, we can use helper
 const directionHelper = new THREE.DirectionalLightHelper(directionalLight);
-gui.addColor(params, "color").onChange(() => {
-  directionalLight.color.set(params.color);
-});
 
 //#4 - point light : a light sits at a point and shoots lights in all direction from that point.
 const pointLight = new THREE.PointLight(params.color, 1);
-scene.add(pointLight);
-gui.add(pointLight, "intensity", 0, 2, 0.01);
-gui.add(pointLight.position, "x", -10, 10);
-gui.add(pointLight.position, "y", 0, 10);
-gui.add(pointLight.position, "z", -10, 10);
 
-gui.addColor(params, "skyColor").onChange(() => {
-  hemisphereLight.color.set(params.skyColor);
-});
+//#5 - spot light : cone form light, effectively lighting at specific area. can control target position
+const spotLight = new THREE.SpotLight(params.color, 1);
+const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+//gui.add(spotLight, "penumbra", 0, 1, 0.01); // a percentage of inner cone from outer cone
+
+//#6 rect area light: imagine a rectangle light dangling on ceiling, rect light only works with mesh standard material
+const rectLight = new THREE.RectAreaLight(params.color, 1);
+scene.add(rectLight);
 gui.addColor(params, "color").onChange(() => {
-  hemisphereLight.groundColor.set(params.groundColor);
+  rectLight.color.set(params.color);
 });
+gui.add(rectLight, "intensity", 0, 2, 0.01);
+gui.add(rectLight.position, "x", -10, 10);
+gui.add(rectLight.position, "y", 0, 10);
+gui.add(rectLight.position, "z", -10, 10);
+
+//performance cost of light: rectangle, spot > directional, point > ambient , hemisphere
 
 const animate = () => {
   requestAnimationFrame(animate);
