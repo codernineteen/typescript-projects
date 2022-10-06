@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  overflow: hidden;
+}
+
+#app {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.axis {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: white;
+}
+
+.x {
+  color: blue;
+}
